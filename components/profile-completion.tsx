@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Briefcase, GraduationCap, Award, Code, FileCheck, Globe, Target, LinkIcon, User, Shield } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
-// 실제 API 호출 함수 (나중에 실제 API로 대체)
+// 임시 목업 데이터를 반환하는 함수
+// TODO: 실제 API 호출 로직으로 교체 예정
 const fetchProfileData = async () => {
-  // 실제 API 호출 대신 임시 데이터 반환
-  // 실제 구현에서는 API 호출로 대체
   return {
     work: [{ company: "ABC 회사", position: "프론트엔드 개발자" }],
     education: [{ school: "XYZ 대학교", major: "컴퓨터 공학" }],
