@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
@@ -28,6 +28,7 @@ import {
   Heart,
   Zap,
 } from "lucide-react"
+import { useResumes } from "@/hooks/use-resumes"
 
 interface Resume {
   id: string
@@ -43,41 +44,25 @@ interface Resume {
 
 export default function ResumeList() {
   const router = useRouter()
-  const [resumes, setResumes] = useState<Resume[]>([
-    {
-      id: "1",
-      title: "기본 이력서",
-      isPrimary: true,
-      lastUpdated: "2025.04.30 15:43 수정",
-      createdAt: "2025.03.15",
-      jobCategory: "IT개발·데이터",
-      company: "회사내규에 따름",
-      location: "경기 이천시",
-      isPublic: true,
-    },
-    {
-      id: "2",
-      title: "백엔드 개발자 이력서",
-      isPrimary: false,
-      lastUpdated: "2025.04.25 10:15 수정",
-      createdAt: "2025.04.10",
-      jobCategory: "IT개발·데이터",
-      company: "스타트업 지원",
-      location: "서울 강남구",
-      isPublic: false,
-    },
-    {
-      id: "3",
-      title: "프론트엔드 개발자 이력서",
-      isPrimary: false,
-      lastUpdated: "2025.04.20 09:30 수정",
-      createdAt: "2025.04.05",
-      jobCategory: "IT개발·데이터",
-      company: "대기업 지원용",
-      location: "서울 전체",
-      isPublic: true,
-    },
-  ])
+  // TODO: Replace with actual authenticated user ID
+  const { resumes: fetchedResumes } = useResumes(1)
+  const [resumes, setResumes] = useState<Resume[]>([])
+
+  useEffect(() => {
+    setResumes(
+      fetchedResumes.map((r) => ({
+        id: String(r.resumeId),
+        title: r.title,
+        isPrimary: r.isPrimary,
+        lastUpdated: r.updatedAt,
+        createdAt: r.createdAt,
+        jobCategory: r.jobCategory || "",
+        company: r.targetCompanyType || "",
+        location: r.targetLocation || "",
+        isPublic: r.isPublic,
+      }))
+    )
+  }, [fetchedResumes])
 
   const [sortBy, setSortBy] = useState<string>("lastUpdated")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
