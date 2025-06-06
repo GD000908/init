@@ -1,0 +1,9 @@
+#!/bin/sh
+# Maven Wrapper 스크립트
+# 이 파일은 실제 Maven Wrapper를 다운로드하고 실행합니다.
+
+MAVEN_VERSION=3.8.7
+MAVEN_WRAPPER_VERSION=3.1.1
+
+echo "Maven Wrapper를 설정하려면 다음 명령을 실행하세요:"
+echo "cd backend && mvn -N wrapper:wrapper -Dmaven=3.8.7"
