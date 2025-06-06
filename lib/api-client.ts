@@ -52,6 +52,31 @@ class ApiClient {
     return this.request<Resume[]>(`/resumes?userId=${userId}`);
   }
 
+  // Post APIs
+  async getPosts(userId: number) {
+    return this.request<Post[]>(`/posts?userId=${userId}`);
+  }
+
+  async createPost(data: CreatePostDto) {
+    return this.request<Post>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updatePost(postId: number, data: Partial<CreatePostDto>) {
+    return this.request<Post>(`/posts/${postId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deletePost(postId: number) {
+    return this.request<void>(`/posts/${postId}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Application APIs
   async getApplications(userId: number) {
     return this.request<Application[]>(`/applications?userId=${userId}`);
@@ -165,6 +190,20 @@ export interface CreateApplicationDto {
   status?: string;
   appliedDate: string;
   notes?: string;
+}
+
+export interface Post {
+  postId: number;
+  userId: number;
+  userName: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePostDto {
+  userId: number;
+  content: string;
 }
 
 export const apiClient = new ApiClient();

@@ -109,6 +109,15 @@ CREATE TABLE activity_stats (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_stat_date (user_id, stat_type, date)
 );
+-- 커뮤니티 게시글 테이블
+CREATE TABLE posts (
+    post_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
 -- 인덱스 생성
 CREATE INDEX idx_applications_user_status ON applications(user_id, status);
@@ -147,3 +156,6 @@ INSERT INTO user_companies (user_id, company_id, job_category, priority) VALUES
 (1, 2, '백엔드', 2),
 (1, 3, '풀스택', 3),
 (1, 4, '프론트엔드', 4);
+
+INSERT INTO posts (user_id, content) VALUES
+(1, "첫 게시글입니다. 커뮤니티에 오신 것을 환영합니다!");

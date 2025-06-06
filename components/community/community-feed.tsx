@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useInView } from "react-intersection-observer"
 import { motion } from "framer-motion"
 import { Search, TrendingUp, Users, Filter, Bell, User, Bookmark } from "lucide-react"
@@ -14,153 +14,34 @@ import TrendingTopics from "./trending-topics"
 import SuggestedUsers from "./suggested-users"
 import FollowingList from "./following-list"
 import MyPostsList from "./my-posts-list"
+import { usePosts } from "@/hooks/use-posts"
 
-// 더미 데이터 - 실제 구현에서는 API에서 가져올 것입니다
-const POSTS = [
-  {
-    id: "1",
-    author: {
-      name: "김개발",
-      username: "devkim",
-      avatar: "/diverse-group-avatars.png",
-      verified: true,
-    },
-    content:
-      "오늘 기술 면접에서 받은 질문들을 공유합니다. 주로 React와 상태 관리에 관한 질문이었어요. 다들 면접 준비 어떻게 하시나요?",
-    images: ["/coding-interview-scenario.png"],
-    createdAt: "2시간 전",
-    likes: 42,
-    comments: 15,
-    reposts: 5,
-    isLiked: false,
-  },
-  {
-    id: "2",
-    author: {
-      name: "이코딩",
-      username: "codinglee",
-      avatar: "/diverse-group-avatars.png",
-      verified: false,
-    },
-    content:
-      "신입 개발자가 포트폴리오를 준비할 때 가장 중요한 것은 무엇일까요? 개인 프로젝트? 오픈소스 기여? 클론 코딩? 여러분의 경험을 공유해주세요!",
-    images: [],
-    createdAt: "5시간 전",
-    likes: 78,
-    comments: 32,
-    reposts: 12,
-    isLiked: true,
-  },
-  {
-    id: "3",
-    author: {
-      name: "박테크",
-      username: "techpark",
-      avatar: "/diverse-group-avatars.png",
-      verified: true,
-    },
-    content:
-      "요즘 핫한 기술 스택 정리해봤습니다.\n\n프론트엔드: React, Next.js, TypeScript\n백엔드: Node.js, NestJS, Go\n데이터: PostgreSQL, MongoDB\n인프라: Docker, Kubernetes, AWS\n\n다른 추천 있으신가요?",
-    images: [],
-    createdAt: "어제",
-    likes: 156,
-    comments: 48,
-    reposts: 27,
-    isLiked: false,
-  },
-  {
-    id: "4",
-    author: {
-      name: "최취준",
-      username: "jobseeker",
-      avatar: "/diverse-group-avatars.png",
-      verified: false,
-    },
-    content:
-      "드디어 합격 메일을 받았습니다! 6개월간의 취준 끝에 원하던 회사에 입사하게 되었어요. 모두의 응원 덕분입니다. 취준생 여러분들도 포기하지 마세요! 💪",
-    images: ["/job-offer-celebration.png"],
-    createdAt: "2일 전",
-    likes: 324,
-    comments: 87,
-    reposts: 42,
-    isLiked: true,
-  },
-  {
-    id: "5",
-    author: {
-      name: "정알고",
-      username: "algojeong",
-      avatar: "/diverse-group-avatars.png",
-      verified: true,
-    },
-    content:
-      "코딩 테스트 준비를 위한 알고리즘 공부 로드맵을 만들어봤습니다. 초보자부터 고급자까지 단계별로 정리했어요. 도움이 되길 바랍니다!",
-    images: ["/algorithm-roadmap.png"],
-    createdAt: "3일 전",
-    likes: 210,
-    comments: 45,
-    reposts: 38,
-    isLiked: false,
-  },
-]
-
-// 내 게시물 더미 데이터
-const MY_POSTS = [
-  {
-    id: "101",
-    author: {
-      name: "박건도",
-      username: "nagundo",
-      avatar: "/my-avatar.png",
-      verified: false,
-    },
-    content: "첫 이력서 작성을 마쳤습니다! 피드백 부탁드려요. #취업준비 #이력서 #신입개발자",
-    images: ["/placeholder.svg?key=w15ih"],
-    createdAt: "1일 전",
-    likes: 24,
-    comments: 8,
-    reposts: 2,
-    isLiked: false,
-  },
-  {
-    id: "102",
-    author: {
-      name: "박건도",
-      username: "nagundo",
-      avatar: "/my-avatar.png",
-      verified: false,
-    },
-    content:
-      "요즘 공부하고 있는 Next.js와 TypeScript 조합이 정말 좋네요. 타입 안정성과 SSR의 장점을 모두 가져갈 수 있어서 만족스럽습니다. 다들 어떤 기술 스택 사용하시나요?",
-    images: [],
-    createdAt: "3일 전",
-    likes: 42,
-    comments: 15,
-    reposts: 5,
-    isLiked: true,
-  },
-  {
-    id: "103",
-    author: {
-      name: "박건도",
-      username: "nagundo",
-      avatar: "/my-avatar.png",
-      verified: false,
-    },
-    content:
-      "오늘 참석한 개발자 네트워킹 행사에서 좋은 인연을 많이 만났습니다. 커리어 성장에는 기술력도 중요하지만 네트워킹도 정말 중요한 것 같아요!",
-    images: ["/placeholder.svg?key=ag5s7"],
-    createdAt: "1주일 전",
-    likes: 67,
-    comments: 12,
-    reposts: 8,
-    isLiked: false,
-  },
-]
 
 export default function CommunityFeed() {
-  const [posts, setPosts] = useState(POSTS)
-  const [myPosts, setMyPosts] = useState(MY_POSTS)
+  const { posts: fetchedPosts } = usePosts(1)
+  const [posts, setPosts] = useState<any[]>([])
+  const [myPosts, setMyPosts] = useState<any[]>([])
+  useEffect(() => {
+    setPosts(
+      fetchedPosts.map((p) => ({
+        id: String(p.postId),
+        author: {
+          name: p.userName,
+          username: p.userName,
+          avatar: "/placeholder.svg",
+          verified: false,
+        },
+        content: p.content,
+        images: [],
+        createdAt: p.createdAt,
+        likes: 0,
+        comments: 0,
+        reposts: 0,
+        isLiked: false,
+      }))
+    )
+    setMyPosts([])
+  }, [fetchedPosts])
   const [activeTab, setActiveTab] = useState("for-you")
   const { ref, inView } = useInView({
     triggerOnce: true,
