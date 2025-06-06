@@ -25,7 +25,7 @@ import {
   Plus,
   Trash2,
   BookOpen,
-  BadgeIcon as Certificate,
+  BadgeCheck as Certificate,
   Heart,
   Mail,
   Phone,
